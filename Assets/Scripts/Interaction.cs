@@ -44,7 +44,6 @@ public class Interaction : MonoBehaviour
 				if (!pad.isHeld && Vector2.Distance(pad.position, finger.position) <= pad.radius)
 				{
 					pad.Hold(finger);
-					finger.isEmpty = false;
 				}
 			}
 

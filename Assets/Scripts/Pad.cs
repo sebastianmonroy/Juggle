@@ -49,6 +49,8 @@ public class Pad : MonoBehaviour
 	}
 
 	public void Hold(Finger finger) {
+		finger.isEmpty = false;
+		
 		this.finger = finger;
 		this.isHeld = true;
 		this.radius = 1.5f;
