@@ -7,6 +7,7 @@ public class Pad : MonoBehaviour
 	public Color color;
 	public float radius = 1f;
 
+	public float mass;
 	public Vector2 position;
 	public Vector2 velocity;
 
@@ -24,7 +25,6 @@ public class Pad : MonoBehaviour
 		{
 			if (finger.isValid && finger != null)
 			{
-				//position = finger.position;
 				velocity = finger.velocity;
 			}
 			else 
@@ -34,13 +34,14 @@ public class Pad : MonoBehaviour
 				radius = 1f;
 			}
 		}
-		else 
-		{
-			
-		}
+
+
 		Move();
+
+		this.mass = this.radius;
 		this.transform.position = new Vector3(position.x, position.y, 0f);
 		this.transform.localScale = Vector3.one * radius;
+		this.GetComponent<SpriteRenderer>().color = color;
 	}
 
 	void Move() {
@@ -50,6 +51,6 @@ public class Pad : MonoBehaviour
 	public void Hold(Finger finger) {
 		this.finger = finger;
 		this.isHeld = true;
-		this.radius = 2f;
+		this.radius = 1.5f;
 	}
 }

@@ -131,6 +131,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   padPrefab: {fileID: 100000, guid: d1820a8f0dbece04a92a45741e5205f4, type: 2}
   pads: []
+  padColors:
+  - {r: .709803939, g: .48538062, b: .48538062, a: 1}
+  - {r: .454901963, g: .749019623, b: .925490201, a: 1}
+  - {r: .631372571, g: .807843149, b: .572549045, a: 1}
+  - {r: .749019623, g: .631372571, b: .749019623, a: 1}
+  - {r: 1, g: .959558845, b: .75, a: 1}
 --- !u!1 &1190066092
 GameObject:
   m_ObjectHideFlags: 0

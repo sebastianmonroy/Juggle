@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Finger {
+public class Finger 
+{
 	public Touch touch;
 	public int id;
 
@@ -11,7 +12,7 @@ public class Finger {
 	public Vector2 velocity;
 
 	public bool isValid;
-	public bool isNew;
+	public bool isEmpty;
 
 	public Finger() {}
 
@@ -26,7 +27,7 @@ public class Finger {
 		this.id = touch.fingerId;
 		this.position = GetWorldPosition();
 		this.isValid = true;
-		this.isNew = true;
+		this.isEmpty = true;
 	}
 
 	public void Update(Touch touch)
@@ -55,7 +56,6 @@ public class Finger {
 		this.velocity = sumDeltas;
 
 		this.isValid = true;
-		this.isNew = false;
 
 		Debug.DrawRay(new Vector3(this.position.x, this.position.y, -2f), Vector3.forward * 3f, Color.red);
 	}
