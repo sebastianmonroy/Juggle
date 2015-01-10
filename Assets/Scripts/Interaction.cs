@@ -35,18 +35,24 @@ public class Interaction : MonoBehaviour
 	}
 	
 	void Update () {
-		// Handle finger touch interactions
+		//Debug.Log("" + pads.Count);
+		// Handle finger grabs
 		foreach (Finger finger in GestureHandler.instance.fingers) 
 		{
 			// Pads are held by fingers that touch them
 			foreach (Pad pad in pads) 
 			{
-				if (!pad.isHeld && Vector2.Distance(pad.position, finger.position) <= pad.radius)
+				//Debug.Log("" + Vector2.Distance(pad.position, finger.position));
+				if (!pad.isHeld && finger.isEmpty && Vector2.Distance(pad.position, finger.position) <= pad.radius)
 				{
 					pad.Hold(finger);
 				}
 			}
-
+		}
+		
+		// Handle new pad creation
+		foreach (Finger finger in GestureHandler.instance.fingers) 
+		{
 			// Create new pads for new finger touches that miss all pads
 			if (finger.isEmpty)
 			{
@@ -55,21 +61,42 @@ public class Interaction : MonoBehaviour
 				newPad.position = finger.position;
 				newPad.color = padColors[Random.Range(0, padColors.Count)];
 				newPad.Hold(finger);
+
+				pads.Add(newPad);
 			}
 		}
 
-		// Handle joint creation
+		// Handle new joint creation
 		foreach (Pad pad in pads) 
 		{
 			List<Pad> others = pads;
-			pads.Remove(pad);
 
 			foreach (Pad other in others) 
 			{
-				if (Vector2.Distance(pad.position, other.position) <= pad.radius + other.radius)
+				// prevent joints to self
+				if (pad != other) 
 				{
-					Joint newJoint = new Joint(pad, other);
-					joints.Add(newJoint);
+					bool duplicate = false;
+					foreach (Joint joint in joints)
+					{
+						// prevent duplicate joints
+						if ((joint.A == pad && joint.B == other) || (joint.A == other && joint.B == pad))
+						{
+							duplicate = true;
+						}
+					}
+
+					float distance = Vector2.Distance(pad.position, other.position);
+					float size = pad.transform.lossyScale.x + other.transform.lossyScale.x;
+					Debug.Log("" + distance + " vs " + size);
+					if (!duplicate && distance <= 1f)
+					{
+						// create new joint if it is not a duplicate and the 
+						Joint newJoint = new Joint(pad, other);
+						joints.Add(newJoint);
+
+						Debug.Log("JOIN");
+					}
 				}
 			}
 		}
@@ -88,8 +115,8 @@ public class Interaction : MonoBehaviour
 
 			float impulse = (relativeVelocity + relativeDistance / Time.deltaTime) / (1f/A.mass + 1f/B.mass);
 
-			A.velocity += axis * impulse;
-			B.velocity -= axis * impulse;
+			A.velocity += axis * impulse * 1f/A.mass;
+			B.velocity -= axis * impulse * 1f/B.mass;
 
 			Debug.DrawLine(new Vector3(A.position.x, A.position.y, 0f), new Vector3(B.position.x, B.position.y, 0f), Color.blue);
 		}

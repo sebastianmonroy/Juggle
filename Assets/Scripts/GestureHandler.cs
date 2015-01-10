@@ -84,6 +84,7 @@ public class GestureHandler : MonoBehaviour
 	public static GestureHandler instance;
 	public int fingerCount = 0;
 	public List<Finger> fingers = new List<Finger>();
+	public bool debugFingers;
 
 	void Start()
 	{
@@ -118,16 +119,7 @@ public class GestureHandler : MonoBehaviour
 			}
 		}
 
-		// Clean up invalid fingers
-		List<Finger> tempFingers = fingers;
-		foreach (Finger finger in fingers) 
-		{
-			if (!finger.isValid) 
-			{
-				tempFingers.Remove(finger);
-			}
-		}
-		fingers = tempFingers;
+		CleanFingers();
 
 		// Make new Fingers for remaining unaccounted-for touches
 		foreach (Touch touch in newTouches) 
@@ -141,20 +133,40 @@ public class GestureHandler : MonoBehaviour
 		PrintAllFingers();
 	}
 
-	void PrintAllFingers() {
-		if (fingerCount > 0) 
+	void PrintAllFingers() 
+	{
+		if (debugFingers)
 		{
-			Debug.Log("");
-			Debug.Log("########### " + fingerCount + " Fingers ###########");
-			foreach (Finger finger in fingers) 
+			if (fingerCount > 0) 
 			{
-				Debug.Log("\t" + finger.ToString());
+				string output = "";
+				output += "+-----------" + fingerCount + " Fingers-----------+\n";
+				foreach (Finger finger in fingers) 
+				{
+					output += "|\t" + finger.ToString() + "\n";
+				}
+				output += "+--------------------------------+";
+				print(output);
+			} 
+			else 
+			{
+				//Debug.Log("########### 0 Fingers ###########");
 			}
-			Debug.Log("#################################");
-		} 
-		else 
-		{
-			//Debug.Log("########### 0 Fingers ###########");
 		}
+	}
+
+	void CleanFingers() 
+	{
+		// Clean up invalid Fingers
+		List<Finger> valids = new List<Finger>();
+		foreach (Finger finger in fingers)
+		{
+			if (finger.isValid)
+			{
+				valids.Add(finger);
+			}
+		}
+
+		fingers = valids;
 	}
 }
