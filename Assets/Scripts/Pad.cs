@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class Pad : MonoBehaviour 
 {
 	public Color color;
-	public float radius = 1f;
+	public float radius = 0.75f;
 
 	public float mass;
 	public Vector2 position;
@@ -32,7 +32,7 @@ public class Pad : MonoBehaviour
 			{
 				isHeld = false;
 				finger = null;
-				radius = 1.25f;
+				radius = 0.75f;
 			}
 		}
 
@@ -91,6 +91,6 @@ public class Pad : MonoBehaviour
 
 		this.finger = finger;
 		this.isHeld = true;
-		this.radius = 3f;
+		this.radius = 1f;
 	}
 }
