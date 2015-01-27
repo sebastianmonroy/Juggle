@@ -7,6 +7,9 @@ public class MainStateManager : MonoBehaviour
 	public static MainStateManager instance;
 	public bool initialized = false;
 
+	public float playerPadRadius = 1.0f;
+	public float courtPadRadius = 0.5f;
+
 	public SimpleStateMachine stateMachine;
 	SimpleState setupState, onState, overState, finishedState;
 
@@ -29,12 +32,17 @@ public class MainStateManager : MonoBehaviour
 	{
 		if (Interaction.instance.initialized)
 		{
-			Interaction.instance.CreatePad(new Vector2(-2.5f, 0f));
-			Interaction.instance.CreatePad(new Vector2(-1.5f, 0f));
-			Interaction.instance.CreatePad(new Vector2(-0.5f, 0f));
-			Interaction.instance.CreatePad(new Vector2(0.5f, 0f));
-			Interaction.instance.CreatePad(new Vector2(1.5f, 0f));
-			Interaction.instance.CreatePad(new Vector2(2.5f, 0f));
+			// Player Pads
+			Interaction.instance.CreatePlayerPad(new Vector2(0f, -3.0f), playerPadRadius);
+			Interaction.instance.CreatePlayerPad(new Vector2(0f, 3.0f), playerPadRadius);
+
+			// Court Pads
+			Interaction.instance.CreateCourtPad(new Vector2(-2.5f, courtPadRadius));
+			Interaction.instance.CreateCourtPad(new Vector2(-1.5f, courtPadRadius));
+			Interaction.instance.CreateCourtPad(new Vector2(-0.5f, courtPadRadius));
+			Interaction.instance.CreateCourtPad(new Vector2(0.5f, courtPadRadius));
+			Interaction.instance.CreateCourtPad(new Vector2(1.5f, courtPadRadius));
+			Interaction.instance.CreateCourtPad(new Vector2(2.5f, courtPadRadius));
 
 			stateMachine.SwitchStates(onState);
 		}

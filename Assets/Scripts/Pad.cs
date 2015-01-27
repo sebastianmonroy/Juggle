@@ -14,6 +14,9 @@ public class Pad : MonoBehaviour
 	public Finger finger;
 	public bool isHeld;
 
+	public bool isPlayerPad = false;
+	public bool debug; 
+
 	private LineRenderer lineRenderer;
 
 	void Awake () 
@@ -32,6 +35,7 @@ public class Pad : MonoBehaviour
 			}
 			else 
 			{
+				Print("finger unheld");
 				isHeld = false;
 				finger = null;
 			}
@@ -42,7 +46,7 @@ public class Pad : MonoBehaviour
 		Friction();
 
 		this.transform.position = new Vector3(this.position.x, this.position.y, 0f);
-		this.transform.localScale = Vector3.one * radius;
+		this.transform.localScale = Vector3.one * 2f * radius;
 		this.GetComponent<SpriteRenderer>().color = color;
 	}
 
@@ -54,6 +58,16 @@ public class Pad : MonoBehaviour
 	void Friction() 
 	{
 		this.velocity *= 0.975f;
+	}
+
+	public void SetPlayerPad(bool isPlayerPad)
+	{
+		this.isPlayerPad = isPlayerPad;
+	}
+
+	public bool IsPlayerPad()
+	{
+		return this.isPlayerPad;
 	}
 
 	public float GetRadius()
@@ -134,9 +148,18 @@ public class Pad : MonoBehaviour
 
 	public void Hold(Finger finger) 
 	{
+		Print("isheld " + isHeld);
 		finger.isEmpty = false;
 
 		this.finger = finger;
 		this.isHeld = true;
+	}
+
+	void Print(string stuff)
+	{
+		if (debug)
+		{
+			Debug.Log(stuff);
+		}
 	}
 }

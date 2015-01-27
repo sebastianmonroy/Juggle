@@ -26,7 +26,6 @@ public class Interaction : MonoBehaviour
 
 	public void HandleFingerGrabs()
 	{
-		Debug.Log(GestureHandler.instance.fingers.Count);
 		// Handle finger grabs
 		foreach (Finger finger in GestureHandler.instance.fingers) 
 		{
@@ -42,7 +41,19 @@ public class Interaction : MonoBehaviour
 		}
 	}
 
-	public void CreatePad(Vector2 position, float radius = 1f)
+	public void CreatePlayerPad(Vector2 position, float radius = 1f)
+	{
+		GameObject newPadObject = Instantiate(padPrefab, new Vector3(position.x, position.y, 0f), Quaternion.identity) as GameObject;
+		Pad newPad = newPadObject.GetComponent<Pad>();
+		newPad.SetPosition(position);
+		newPad.SetRadius(radius);
+		newPad.SetColor(RandomColor());
+		newPad.SetPlayerPad(true);
+		
+		pads.Add(newPad);
+	}
+
+	public void CreateCourtPad(Vector2 position, float radius = 0.5f)
 	{
 		GameObject newPadObject = Instantiate(padPrefab, new Vector3(position.x, position.y, 0f), Quaternion.identity) as GameObject;
 		Pad newPad = newPadObject.GetComponent<Pad>();
@@ -53,7 +64,7 @@ public class Interaction : MonoBehaviour
 		pads.Add(newPad);
 	}
 
-	public void CreatePad(Finger finger)
+	public void CreateFingerPad(Finger finger)
 	{
 		GameObject newPadObject = Instantiate(padPrefab, new Vector3(finger.position.x, finger.position.y, 0f), Quaternion.identity) as GameObject;
 		Pad newPad = newPadObject.GetComponent<Pad>();
@@ -78,7 +89,7 @@ public class Interaction : MonoBehaviour
 			// Create new pads for new finger touches that miss all pads
 			if (finger.isEmpty)
 			{
-				CreatePad(finger);
+				CreateFingerPad(finger);
 			}
 		}
 	}
@@ -88,15 +99,15 @@ public class Interaction : MonoBehaviour
 		// Handle new joint creation
 		foreach (Pad pad in pads) 
 		{
-			// only create joints to a currently held pad
-			if (pad.isHeld)
+			// only create joints to a player pad
+			if (pad.IsPlayerPad())
 			{
 				List<Pad> others = pads;
 
 				foreach (Pad other in others) 
 				{
-					// prevent joints to self, only create joint if both pads are held
-					if (other != pad && other.isHeld) 
+					// prevent joints to self, only create joint if other pads is held and not a player pad
+					if (other != pad && !other.IsPlayerPad() && other.isHeld) 
 					{
 						bool duplicate = false;
 						foreach (Joint joint in joints)
@@ -144,7 +155,7 @@ public class Interaction : MonoBehaviour
 			{
 				Debug.DrawLine(new Vector3(A.position.x, A.position.y, 0f), new Vector3(B.position.x, B.position.y, 0f), Color.green);
 			}
-			else if (A.isHeld)
+			else if (A.isHeld || A.IsPlayerPad())
 			{
 				Vector3 newVel = Vector3.Dot(B.GetVelocity3(), B_tang_axis) * B_tang_axis;
 				newVel += Vector3.Dot(A.GetVelocity3(), A_norm_axis) * A_norm_axis;
@@ -153,7 +164,7 @@ public class Interaction : MonoBehaviour
 
 				Debug.DrawLine(new Vector3(A.position.x, A.position.y, 0f), new Vector3(B.position.x, B.position.y, 0f), Color.blue);
 			}
-			else if (B.isHeld)
+			else if (B.isHeld || B.IsPlayerPad())
 			{
 				Vector3 newVel = Vector3.Dot(A.GetVelocity3(), A_tang_axis) * A_tang_axis;
 				newVel += Vector3.Dot(B.GetVelocity3(), B_norm_axis) * B_norm_axis;
@@ -210,7 +221,7 @@ public class Interaction : MonoBehaviour
 			{
 				joint.distance = AB_distance;
 			}
-			else if (A.isHeld)
+			else if (A.isHeld || A.IsPlayerPad())
 			{
 				A_desiredPosition = A.GetPosition();
 
@@ -221,7 +232,7 @@ public class Interaction : MonoBehaviour
 				B_newVelocity = B_tangVelocity * B_tang_axis + B_normVelocity * B_norm_axis;
 				//Debug.Log(B_addedVelocity);
 			}
-			else if (B.isHeld)
+			else if (B.isHeld || B.IsPlayerPad())
 			{
 				B_desiredPosition = B.GetPosition();
 

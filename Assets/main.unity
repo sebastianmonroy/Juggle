@@ -152,6 +152,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initialized: 0
+  playerPadRadius: 1
+  courtPadRadius: .5
   stateMachine:
     currentState: 
 --- !u!1 &1190066092
