@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public class Interaction : MonoBehaviour
 {
 	public static Interaction instance;
+	public bool initialized = false;
+
 	public GameObject padPrefab;
 	public List<Pad> pads = new List<Pad>();
 	public List<Color> padColors;
@@ -14,10 +16,17 @@ public class Interaction : MonoBehaviour
 	void Start()
 	{
 		instance = this;
+		initialized = true;
 	}
 
-	void HandleFingerGrabs()
+	void LateUpdate()
 	{
+		HandleJointRendering();
+	}
+
+	public void HandleFingerGrabs()
+	{
+		Debug.Log(GestureHandler.instance.fingers.Count);
 		// Handle finger grabs
 		foreach (Finger finger in GestureHandler.instance.fingers) 
 		{
@@ -25,7 +34,7 @@ public class Interaction : MonoBehaviour
 			foreach (Pad pad in pads) 
 			{
 				//Debug.Log("" + Vector2.Distance(pad.position, finger.position));
-				if (!pad.isHeld && finger.isEmpty && Vector2.Distance(pad.position, finger.position) <= pad.radius)
+				if (!pad.isHeld && finger.isEmpty && Vector2.Distance(pad.GetPosition(), finger.GetWorldPosition()) <= pad.GetRadius())
 				{
 					pad.Hold(finger);
 				}
@@ -33,7 +42,35 @@ public class Interaction : MonoBehaviour
 		}
 	}
 
-	void HandlePadCreation()
+	public void CreatePad(Vector2 position, float radius = 1f)
+	{
+		GameObject newPadObject = Instantiate(padPrefab, new Vector3(position.x, position.y, 0f), Quaternion.identity) as GameObject;
+		Pad newPad = newPadObject.GetComponent<Pad>();
+		newPad.SetPosition(position);
+		newPad.SetRadius(radius);
+		newPad.SetColor(RandomColor());
+		
+		pads.Add(newPad);
+	}
+
+	public void CreatePad(Finger finger)
+	{
+		GameObject newPadObject = Instantiate(padPrefab, new Vector3(finger.position.x, finger.position.y, 0f), Quaternion.identity) as GameObject;
+		Pad newPad = newPadObject.GetComponent<Pad>();
+		newPad.SetPosition(finger.position);
+		newPad.SetColor(RandomColor());
+
+		newPad.Hold(finger);
+
+		pads.Add(newPad);
+	}
+
+	public Color RandomColor()
+	{
+		return padColors[Random.Range(0, padColors.Count)];
+	}
+
+	public void HandlePadCreation()
 	{
 		// Handle new pad creation
 		foreach (Finger finger in GestureHandler.instance.fingers) 
@@ -41,18 +78,12 @@ public class Interaction : MonoBehaviour
 			// Create new pads for new finger touches that miss all pads
 			if (finger.isEmpty)
 			{
-				GameObject newPadObject = Instantiate(padPrefab, new Vector3(finger.position.x, finger.position.y, 0f), Quaternion.identity) as GameObject;
-				Pad newPad = newPadObject.GetComponent<Pad>();
-				newPad.position = finger.position;
-				newPad.color = padColors[Random.Range(0, padColors.Count)];
-				newPad.Hold(finger);
-
-				pads.Add(newPad);
+				CreatePad(finger);
 			}
 		}
 	}
 
-	void HandleJointCreation()
+	public void HandleJointCreation()
 	{
 		// Handle new joint creation
 		foreach (Pad pad in pads) 
@@ -94,7 +125,7 @@ public class Interaction : MonoBehaviour
 		}
 	}
 
-	void HandleJointPhysics()
+	public void HandleJointPhysics()
 	{
 		// Handle joint physics
 		foreach (Joint joint in joints)
@@ -145,81 +176,81 @@ public class Interaction : MonoBehaviour
 
 			A.velocity += axis * impulse * 1f/A.mass;
 			B.velocity -= axis * impulse * 1f/B.mass;*/
+		}
 
-			// Handle Joint Correction
-			foreach (Joint joint in joints)
+		// Handle Joint Correction
+		foreach (Joint joint in joints)
+		{
+			Pad A = joint.A;	Pad B = joint.B;
+			Vector2 A_norm_axis = (B.GetPosition() - A.GetPosition()).normalized;
+			Vector2 B_norm_axis = (A.GetPosition() - B.GetPosition()).normalized;	
+			Vector3 A_norm_axis3 = (B.GetPosition3() - A.GetPosition3()).normalized;
+			Vector3 B_norm_axis3 = (A.GetPosition3() - B.GetPosition3()).normalized;
+			Vector3 A_tang_axis3 = Vector3.Cross(A_norm_axis, Vector3.forward);
+			Vector3 B_tang_axis3 = Vector3.Cross(B_norm_axis, Vector3.forward);
+			Vector2 A_tang_axis = new Vector2(A_tang_axis3.x, A_tang_axis3.y);
+			Vector2 B_tang_axis = new Vector2(B_tang_axis3.x, B_tang_axis3.y);
+
+			//float dist_error = (Vector2.Distance(B.GetPosition(), A.GetPosition()) - joint.distance);
+			float AB_distance = Vector2.Distance(B.GetPosition(), A.GetPosition());
+			Vector2 A_desiredPosition = Vector2.zero;
+			Vector2 B_desiredPosition = Vector2.zero;
+			Vector2 A_newVelocity = A.GetVelocity();
+			Vector2 B_newVelocity = B.GetVelocity();
+
+			float A_normVelocity = Vector2.Dot(A.GetVelocity(), A_norm_axis);
+			float B_normVelocity = Vector2.Dot(B.GetVelocity(), B_norm_axis);
+			float A_tangVelocity = Vector2.Dot(A.GetVelocity(), A_tang_axis);
+			float B_tangVelocity = Vector2.Dot(B.GetVelocity(), B_tang_axis);
+
+			float A_error;
+			float B_error;
+
+			if (A.isHeld && B.isHeld)
 			{
-				Pad A = joint.A;	Pad B = joint.B;
-				Vector2 A_norm_axis = (B.GetPosition() - A.GetPosition()).normalized;
-				Vector2 B_norm_axis = (A.GetPosition() - B.GetPosition()).normalized;	
-				Vector3 A_norm_axis3 = (B.GetPosition3() - A.GetPosition3()).normalized;
-				Vector3 B_norm_axis3 = (A.GetPosition3() - B.GetPosition3()).normalized;
-				Vector3 A_tang_axis3 = Vector3.Cross(A_norm_axis, Vector3.forward);
-				Vector3 B_tang_axis3 = Vector3.Cross(B_norm_axis, Vector3.forward);
-				Vector2 A_tang_axis = new Vector2(A_tang_axis3.x, A_tang_axis3.y);
-				Vector2 B_tang_axis = new Vector2(B_tang_axis3.x, B_tang_axis3.y);
-
-				//float dist_error = (Vector2.Distance(B.GetPosition(), A.GetPosition()) - joint.distance);
-				float AB_distance = Vector2.Distance(B.GetPosition(), A.GetPosition());
-				Vector2 A_desiredPosition = Vector2.zero;
-				Vector2 B_desiredPosition = Vector2.zero;
-				Vector2 A_newVelocity = A.GetVelocity();
-				Vector2 B_newVelocity = B.GetVelocity();
-
-				float A_normVelocity = Vector2.Dot(A.GetVelocity(), A_norm_axis);
-				float B_normVelocity = Vector2.Dot(B.GetVelocity(), B_norm_axis);
-				float A_tangVelocity = Vector2.Dot(A.GetVelocity(), A_tang_axis);
-				float B_tangVelocity = Vector2.Dot(B.GetVelocity(), B_tang_axis);
-
-				float A_error;
-				float B_error;
-
-				if (A.isHeld && B.isHeld)
-				{
-					joint.distance = AB_distance;
-				}
-				else if (A.isHeld)
-				{
-					A_desiredPosition = A.GetPosition();
-
-					B_desiredPosition = A.GetPosition() + joint.distance * A_norm_axis;
-					B_error = Mathf.Sign(AB_distance - joint.distance) * Vector2.Distance(B.GetPosition(), B_desiredPosition);
-
-					B_normVelocity = Mathf.Lerp(B_normVelocity, B_error / Time.deltaTime, Time.deltaTime * joint.rigidity);
-					B_newVelocity = B_tangVelocity * B_tang_axis + B_normVelocity * B_norm_axis;
-					//Debug.Log(B_addedVelocity);
-				}
-				else if (B.isHeld)
-				{
-					B_desiredPosition = B.GetPosition();
-
-					A_desiredPosition = B.GetPosition() + joint.distance * B_norm_axis;
-					A_error = Mathf.Sign(AB_distance - joint.distance) * Vector2.Distance(A.GetPosition(), A_desiredPosition);
-					
-					A_normVelocity = Mathf.Lerp(A_normVelocity, A_error / Time.deltaTime, Time.deltaTime * joint.rigidity);
-					A_newVelocity = A_tangVelocity * A_tang_axis + A_normVelocity * A_norm_axis;
-					//Debug.Log(A_addedVelocity);
-				}
-				else 
-				{
-					float AB_error = AB_distance - joint.distance;
-					A_error = AB_error / 2f;
-					B_error = AB_error / 2f;
-
-					B_normVelocity = Mathf.Lerp(B_normVelocity, B_error / Time.deltaTime, Time.deltaTime * joint.rigidity);
-					A_normVelocity = Mathf.Lerp(A_normVelocity, A_error / Time.deltaTime, Time.deltaTime * joint.rigidity);
-					
-					A_newVelocity = A_tangVelocity * A_tang_axis + A_normVelocity * A_norm_axis;
-					B_newVelocity = B_tangVelocity * B_tang_axis + B_normVelocity * B_norm_axis;
-				}
-
-				A.SetVelocity(A_newVelocity);
-				B.SetVelocity(B_newVelocity);
+				joint.distance = AB_distance;
 			}
+			else if (A.isHeld)
+			{
+				A_desiredPosition = A.GetPosition();
+
+				B_desiredPosition = A.GetPosition() + joint.distance * A_norm_axis;
+				B_error = Mathf.Sign(AB_distance - joint.distance) * Vector2.Distance(B.GetPosition(), B_desiredPosition);
+
+				B_normVelocity = Mathf.Lerp(B_normVelocity, B_error / Time.deltaTime, Time.deltaTime * joint.rigidity);
+				B_newVelocity = B_tangVelocity * B_tang_axis + B_normVelocity * B_norm_axis;
+				//Debug.Log(B_addedVelocity);
+			}
+			else if (B.isHeld)
+			{
+				B_desiredPosition = B.GetPosition();
+
+				A_desiredPosition = B.GetPosition() + joint.distance * B_norm_axis;
+				A_error = Mathf.Sign(AB_distance - joint.distance) * Vector2.Distance(A.GetPosition(), A_desiredPosition);
+				
+				A_normVelocity = Mathf.Lerp(A_normVelocity, A_error / Time.deltaTime, Time.deltaTime * joint.rigidity);
+				A_newVelocity = A_tangVelocity * A_tang_axis + A_normVelocity * A_norm_axis;
+				//Debug.Log(A_addedVelocity);
+			}
+			else 
+			{
+				float AB_error = AB_distance - joint.distance;
+				A_error = AB_error / 2f;
+				B_error = AB_error / 2f;
+
+				B_normVelocity = Mathf.Lerp(B_normVelocity, B_error / Time.deltaTime, Time.deltaTime * joint.rigidity);
+				A_normVelocity = Mathf.Lerp(A_normVelocity, A_error / Time.deltaTime, Time.deltaTime * joint.rigidity);
+				
+				A_newVelocity = A_tangVelocity * A_tang_axis + A_normVelocity * A_norm_axis;
+				B_newVelocity = B_tangVelocity * B_tang_axis + B_normVelocity * B_norm_axis;
+			}
+
+			A.SetVelocity(A_newVelocity);
+			B.SetVelocity(B_newVelocity);
 		}
 	}
 
-	void HandleJointRendering()
+	public void HandleJointRendering()
 	{
 		// Handle Joint Rendering
 		foreach (Joint joint in joints)

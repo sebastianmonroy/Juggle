@@ -84,6 +84,7 @@ GameObject:
   - 4: {fileID: 995863377}
   - 114: {fileID: 995863378}
   - 114: {fileID: 995863379}
+  - 114: {fileID: 995863380}
   m_Layer: 0
   m_Name: Scene
   m_TagString: Untagged
@@ -130,6 +131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdd1bff2a65819547b7ae5b9aff00bc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  initialized: 0
   padPrefab: {fileID: 100000, guid: d1820a8f0dbece04a92a45741e5205f4, type: 2}
   pads: []
   padColors:
@@ -138,6 +140,20 @@ MonoBehaviour:
   - {r: .631372571, g: .807843149, b: .572549045, a: 1}
   - {r: .749019623, g: .631372571, b: .749019623, a: 1}
   - {r: 1, g: .959558845, b: .75, a: 1}
+--- !u!114 &995863380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 995863376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1dafa9d0f0745845802e2b6b6d50d80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialized: 0
+  stateMachine:
+    currentState: 
 --- !u!1 &1190066092
 GameObject:
   m_ObjectHideFlags: 0

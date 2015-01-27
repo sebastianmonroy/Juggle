@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 public class Pad : MonoBehaviour 
 {
-	public Color color;
-	public float radius = 0.75f;
+	private Color color;
+	private float radius = 1f;
 
-	public float mass;
+	private float mass;
 	public Vector2 position;
 	public Vector2 velocity;
 
@@ -34,7 +34,6 @@ public class Pad : MonoBehaviour
 			{
 				isHeld = false;
 				finger = null;
-				radius = 0.75f;
 			}
 		}
 
@@ -42,7 +41,6 @@ public class Pad : MonoBehaviour
 		Move();
 		Friction();
 
-		this.mass = this.radius;
 		this.transform.position = new Vector3(this.position.x, this.position.y, 0f);
 		this.transform.localScale = Vector3.one * radius;
 		this.GetComponent<SpriteRenderer>().color = color;
@@ -56,6 +54,26 @@ public class Pad : MonoBehaviour
 	void Friction() 
 	{
 		this.velocity *= 0.975f;
+	}
+
+	public float GetRadius()
+	{
+		return this.radius;
+	}
+
+	public void SetRadius(float radius)
+	{
+		this.radius = radius;
+	}
+
+	public Color GetColor()
+	{
+		return this.color;
+	}
+
+	public void SetColor(Color color)
+	{
+		this.color = color;
 	}
 
 	public Vector2 GetPosition() 
@@ -120,6 +138,5 @@ public class Pad : MonoBehaviour
 
 		this.finger = finger;
 		this.isHeld = true;
-		this.radius = 1f;
 	}
 }
