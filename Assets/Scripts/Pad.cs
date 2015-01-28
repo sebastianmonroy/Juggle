@@ -174,13 +174,13 @@ public class Pad : MonoBehaviour
 		}
 	}
 
-	void OnCollisionEnter2D(Collision2D collision)
+	void OnTriggerEnter2D(Collider2D otherCollider)
 	{
-		Debug.Log("collision");
+		Print("collision");
 
-		foreach (ContactPoint2D contact in collision.contacts)
-		{
-			Collider2D otherCollider = contact.otherCollider;
+		//foreach (ContactPoint2D contact in collision.contacts)
+		//{
+			//Collider2D otherCollider = contact.otherCollider;
 			Pad otherPad = otherCollider.GetComponent<Pad>();
 
 			// if hit another pad and other pad's mother isn't me
@@ -189,14 +189,14 @@ public class Pad : MonoBehaviour
 				// if hit the other player's mother pad
 				if (otherPad.IsPlayerPad())
 				{
-					Debug.Log("hit mother pad");
+					Print("hit mother pad");
 				}
 				// else if hit other player's child pad
 				else 
 				{
-					Debug.Log("hit child pad");
+					Print("hit child pad");
 				}
 			}
-		}
+		//}
 	}
 }

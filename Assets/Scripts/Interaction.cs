@@ -106,8 +106,8 @@ public class Interaction : MonoBehaviour
 
 				foreach (Pad other in others) 
 				{
-					// prevent joints to self, only create joint if other pads is held and not a player pad
-					if (other != pad && !other.IsPlayerPad() && other.isHeld) 
+					// prevent joints to self, only create joint if other pads is held and not a player pad, only allows one joint per pad
+					if (other != pad && !other.IsPlayerPad() && other.isHeld && other.GetMother() == null) 
 					{
 						bool duplicate = false;
 						foreach (Joint joint in joints)
