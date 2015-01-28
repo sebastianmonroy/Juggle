@@ -14,6 +14,7 @@ public class Pad : MonoBehaviour
 	public Finger finger;
 	public bool isHeld;
 
+	public Pad mother;
 	public bool isPlayerPad = false;
 	public bool debug; 
 
@@ -155,11 +156,47 @@ public class Pad : MonoBehaviour
 		this.isHeld = true;
 	}
 
-	void Print(string stuff)
+	public void SetMother(Pad mother)
+	{
+		this.mother = mother;
+	}
+
+	public Pad GetMother()
+	{
+		return this.mother;
+	}
+
+	void Print(string output)
 	{
 		if (debug)
 		{
-			Debug.Log(stuff);
+			Debug.Log(output);
+		}
+	}
+
+	void OnCollisionEnter2D(Collision2D collision)
+	{
+		Debug.Log("collision");
+
+		foreach (ContactPoint2D contact in collision.contacts)
+		{
+			Collider2D otherCollider = contact.otherCollider;
+			Pad otherPad = otherCollider.GetComponent<Pad>();
+
+			// if hit another pad and other pad's mother isn't me
+			if (otherPad != null && otherPad.GetMother() != this)
+			{
+				// if hit the other player's mother pad
+				if (otherPad.IsPlayerPad())
+				{
+					Debug.Log("hit mother pad");
+				}
+				// else if hit other player's child pad
+				else 
+				{
+					Debug.Log("hit child pad");
+				}
+			}
 		}
 	}
 }
