@@ -271,4 +271,31 @@ public class Interaction : MonoBehaviour
 			B.DrawJoint(A);
 		}
 	}
+
+	public void DestroyJoint(Pad child)
+	{
+		List<Joint> remainingJoints = new List<Joint>();
+		List<Joint> deadJoints = new List<Joint>();
+
+		foreach (Joint joint in joints)
+		{
+			if (joint.A != child && joint.B != child)
+			{
+				remainingJoints.Add(joint);
+			}
+			else
+			{
+				deadJoints.Add(joint);
+			}
+		}
+
+		joints = remainingJoints;
+		child.UndrawJoint();
+
+		foreach (Joint joint in deadJoints)
+		{
+			joint.A = null;
+			joint.B = null;
+		}
+	}
 }

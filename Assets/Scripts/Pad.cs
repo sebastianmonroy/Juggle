@@ -143,8 +143,14 @@ public class Pad : MonoBehaviour
 
 	public void DrawJoint(Pad other)
 	{
+		lineRenderer.SetVertexCount(2);
 		lineRenderer.SetPosition(0, this.transform.position);
 		lineRenderer.SetPosition(1, other.transform.position);
+	}
+
+	public void UndrawJoint()
+	{
+		lineRenderer.SetVertexCount(0);
 	}
 
 	public void Hold(Finger finger) 
@@ -178,25 +184,37 @@ public class Pad : MonoBehaviour
 	{
 		Print("collision");
 
-		//foreach (ContactPoint2D contact in collision.contacts)
-		//{
-			//Collider2D otherCollider = contact.otherCollider;
-			Pad otherPad = otherCollider.GetComponent<Pad>();
+		
+		//Collider2D otherCollider = contact.otherCollider;
+		Pad otherPad = otherCollider.GetComponent<Pad>();
 
-			// if hit another pad and other pad's mother isn't me
-			if (otherPad != null && otherPad.GetMother() != this)
+		// if child hit another pad and other pad's mother isn't me
+		if (this.GetMother() != null && otherPad != null && otherPad.GetMother() != this)
+		{
+			Vector2 collisionTo = otherPad.GetPosition() - this.GetPosition();
+
+			// if hit the other player's mother pad
+			if (otherPad.IsPlayerPad())
 			{
-				// if hit the other player's mother pad
-				if (otherPad.IsPlayerPad())
-				{
-					Print("hit mother pad");
-				}
-				// else if hit other player's child pad
-				else 
-				{
-					Print("hit child pad");
-				}
+				Print("hit mother pad");
+				otherPad.SetRadius(0.9f * otherPad.GetRadius());
+				this.AddVelocity(-1.5f * this.GetVelocity());
 			}
-		//}
+			// else if hit other player's child pad
+			else if (otherPad.GetMother() != null)
+			{
+				Print("hit child pad");
+				Vector2 myVelocity = this.GetVelocity();
+				Vector2 otherVelocity = otherPad.GetVelocity();
+
+				otherPad.AddVelocity(myVelocity);
+				this.AddVelocity(otherVelocity);
+				
+				/*if (myVelocity.magnitude > 25f && myVelocity.magnitude >= 2f * otherVelocity.magnitude)
+				{
+					Interaction.instance.DestroyJoint(otherPad);
+				}*/
+			}
+		}
 	}
 }
