@@ -122,7 +122,7 @@ public class Interaction : MonoBehaviour
 						float distance = Vector2.Distance(pad.position, other.position);
 						float size = pad.transform.lossyScale.x + other.transform.lossyScale.x;
 						//Debug.Log("" + distance + " vs " + size);
-						if (!duplicate && distance <= 1f)
+						if (!duplicate && distance <= 1.5f)
 						{
 							// create new joint if it is not a duplicate and the 
 							Joint newJoint = new Joint(pad, other);

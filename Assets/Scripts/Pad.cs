@@ -58,7 +58,7 @@ public class Pad : MonoBehaviour
 
 	void Friction() 
 	{
-		this.velocity *= 0.975f;
+		this.velocity *= 0.95f;
 	}
 
 	public void SetPlayerPad(bool isPlayerPad)
@@ -189,12 +189,12 @@ public class Pad : MonoBehaviour
 		Pad otherPad = otherCollider.GetComponent<Pad>();
 
 		// if child hit another pad and other pad's mother isn't me
-		if (this.GetMother() != null && otherPad != null && otherPad.GetMother() != this)
+		if (this.GetMother() != null && otherPad != null && otherPad.GetMother() != this && otherPad.GetMother() != this.GetMother())
 		{
 			Vector2 collisionTo = otherPad.GetPosition() - this.GetPosition();
 
 			// if hit the other player's mother pad
-			if (otherPad.IsPlayerPad())
+			if (otherPad.IsPlayerPad() && this.GetMother() != otherPad)
 			{
 				Print("hit mother pad");
 				otherPad.SetRadius(0.9f * otherPad.GetRadius());
@@ -204,8 +204,10 @@ public class Pad : MonoBehaviour
 			else if (otherPad.GetMother() != null)
 			{
 				Print("hit child pad");
+
 				Vector2 myVelocity = this.GetVelocity();
 				Vector2 otherVelocity = otherPad.GetVelocity();
+
 
 				otherPad.AddVelocity(myVelocity);
 				this.AddVelocity(otherVelocity);
