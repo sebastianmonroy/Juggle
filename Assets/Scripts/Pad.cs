@@ -185,8 +185,32 @@ public class Pad : MonoBehaviour
 		Print("collision");
 
 		
-		//Collider2D otherCollider = contact.otherCollider;
+		//Collider2D otherCollider = collision.collider;
+		GameObject otherObject = otherCollider.gameObject;
 		Pad otherPad = otherCollider.GetComponent<Pad>();
+
+		/*// if pad hit wall
+		if (otherObject.tag == "Wall")
+		{
+			// find overall contact normal axis
+			Vector2 contactAxis = Vector2.zero;
+			foreach (ContactPoint2D contact in collision.contacts)
+			{
+				contactAxis += contact.normal;
+			}
+			contactAxis.Normalize();
+
+			// reflect velocity over contact normal axis
+			this.velocity -= 2f * Vector2.Dot(this.velocity, contactAxis) * contactAxis;
+
+		}*/
+
+		// pad hit wall
+		if (otherObject.tag == "Wall")
+		{
+			// find contact normal axis
+			this.AddVelocity(-2f * this.GetVelocity());
+		}
 
 		// if child hit another pad and other pad's mother isn't me
 		if (this.GetMother() != null && otherPad != null && otherPad.GetMother() != this && otherPad.GetMother() != this.GetMother())
@@ -197,8 +221,9 @@ public class Pad : MonoBehaviour
 			if (otherPad.IsPlayerPad() && this.GetMother() != otherPad)
 			{
 				Print("hit mother pad");
-				otherPad.SetRadius(0.9f * otherPad.GetRadius());
+				//otherPad.SetRadius(0.9f * otherPad.GetRadius());
 				this.AddVelocity(-1.5f * this.GetVelocity());
+				AnimationHandler.instance.ChildOnMotherCollision(otherPad, this);
 			}
 			// else if hit other player's child pad
 			else if (otherPad.GetMother() != null)

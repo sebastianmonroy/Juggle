@@ -157,7 +157,7 @@ public class Interaction : MonoBehaviour
 			}
 			else if (A.isHeld || A.IsPlayerPad())
 			{
-				Vector3 newVel = Vector3.Dot(B.GetVelocity3(), B_tang_axis) * B_tang_axis * 0.95f;
+				Vector3 newVel = Vector3.Dot(B.GetVelocity3(), B_tang_axis) * B_tang_axis * 0.975f;
 				newVel += Vector3.Dot(A.GetVelocity3(), A_norm_axis) * A_norm_axis;
 
 				B.SetVelocity3(newVel);
@@ -166,7 +166,7 @@ public class Interaction : MonoBehaviour
 			}
 			else if (B.isHeld || B.IsPlayerPad())
 			{
-				Vector3 newVel = Vector3.Dot(A.GetVelocity3(), A_tang_axis) * A_tang_axis * 0.95f;
+				Vector3 newVel = Vector3.Dot(A.GetVelocity3(), A_tang_axis) * A_tang_axis * 0.975f;
 				newVel += Vector3.Dot(B.GetVelocity3(), B_norm_axis) * B_norm_axis;
 
 				A.SetVelocity3(newVel);
