@@ -31,8 +31,8 @@ public class Pad : MonoBehaviour
 		{
 			if (finger.isValid && finger != null)
 			{
-				position = finger.position;
-				velocity = finger.velocity;
+				this.position = Vector2.Lerp(position, finger.position, Time.deltaTime * 5f);
+				this.velocity =  Vector2.Lerp(velocity, finger.velocity, Time.deltaTime * 5f);
 			}
 			else 
 			{

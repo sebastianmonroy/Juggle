@@ -23,6 +23,6 @@ public class Joint
 		B.SetMother(A);
 
 		this.distance = Vector2.Distance(A.position, B.position);
-		this.rigidity = 4f;
+		this.rigidity = 15f;
 	}
 }
