@@ -294,6 +294,8 @@ public class Interaction : MonoBehaviour
 
 		foreach (Joint joint in deadJoints)
 		{
+			joint.A.mother = null;
+			joint.B.mother = null;
 			joint.A = null;
 			joint.B = null;
 		}

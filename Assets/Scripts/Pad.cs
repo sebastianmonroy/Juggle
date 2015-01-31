@@ -236,6 +236,9 @@ public class Pad : MonoBehaviour
 
 				otherPad.AddVelocity(myVelocity);
 				this.AddVelocity(otherVelocity);
+
+				Interaction.instance.DestroyJoint(this);
+				Interaction.instance.DestroyJoint(otherPad);
 				
 				/*if (myVelocity.magnitude > 25f && myVelocity.magnitude >= 2f * otherVelocity.magnitude)
 				{
