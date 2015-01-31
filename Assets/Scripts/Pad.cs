@@ -234,8 +234,8 @@ public class Pad : MonoBehaviour
 				Vector2 otherVelocity = otherPad.GetVelocity();
 
 
-				otherPad.AddVelocity(myVelocity);
-				this.AddVelocity(otherVelocity);
+				otherPad.AddVelocity(myVelocity / 2f);
+				this.AddVelocity(otherVelocity / 2f);
 
 				Interaction.instance.DestroyJoint(this);
 				Interaction.instance.DestroyJoint(otherPad);
