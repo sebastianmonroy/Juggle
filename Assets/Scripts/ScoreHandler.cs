@@ -19,20 +19,23 @@ public class ScoreHandler : MonoBehaviour
 
 	public void PlayerScored(int i)
 	{
-		if (i == 1)
+		if (MainStateManager.instance.stateMachine.currentState == "[GAME ON]")
 		{
-			p1Score++;
-			p1ScoreText.text = "" + p1Score;
-		}
-		else if (i == 2)
-		{
-			p2Score++;
-			p2ScoreText.text = "" + p2Score;
-		}
+			if (i == 1)
+			{
+				p1Score++;
+				p1ScoreText.text = "" + p1Score;
+			}
+			else if (i == 2)
+			{
+				p2Score++;
+				p2ScoreText.text = "" + p2Score;
+			}
 
-		if (p1Score > 9 || p2Score > 9)
-		{
-			Application.LoadLevel(Application.loadedLevel);
+			if (p1Score > 9 || p2Score > 9)
+			{
+				Application.LoadLevel(Application.loadedLevel);
+			}
 		}
 	}
 }

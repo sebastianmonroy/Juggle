@@ -21,7 +21,7 @@ public class Interaction : MonoBehaviour
 
 	void LateUpdate()
 	{
-		HandleJointRendering();
+		//HandleJointRendering();
 	}
 
 	public void HandleFingerGrabs()
@@ -111,30 +111,35 @@ public class Interaction : MonoBehaviour
 					// prevent joints to self, only create joint if other pads is held and not a player pad, only allows one joint per pad
 					if (other != pad && !other.IsPlayerPad() && other.isHeld && other.GetMother() == null) 
 					{
-						bool duplicate = false;
-						foreach (Joint joint in joints)
-						{
-							// prevent duplicate joints
-							if ((joint.A == pad && joint.B == other) || (joint.A == other && joint.B == pad))
-							{
-								duplicate = true;
-							}
-						}
-
-						float distance = Vector2.Distance(pad.position, other.position);
-						float size = pad.transform.lossyScale.x + other.transform.lossyScale.x;
-						//Debug.Log("" + distance + " vs " + size);
-						if (!duplicate && distance <= 1.5f)
-						{
-							// create new joint if it is not a duplicate and the 
-							Joint newJoint = new Joint(pad, other);
-							joints.Add(newJoint);
-
-							Debug.Log("JOIN");
-						}
+						CreateJoint(pad, other);
 					}
 				}
 			}
+		}
+	}
+
+	public void CreateJoint(Pad pad, Pad other)
+	{
+		bool duplicate = false;
+		foreach (Joint joint in joints)
+		{
+			// prevent duplicate joints
+			if ((joint.A == pad && joint.B == other) || (joint.A == other && joint.B == pad))
+			{
+				duplicate = true;
+			}
+		}
+
+		float distance = Vector2.Distance(pad.position, other.position);
+		float size = pad.transform.lossyScale.x + other.transform.lossyScale.x;
+		//Debug.Log("" + distance + " vs " + size);
+		if (!duplicate && distance <= 1.5f)
+		{
+			// create new joint if it is not a duplicate and the 
+			Joint newJoint = new Joint(pad, other);
+			joints.Add(newJoint);
+
+			Debug.Log("JOIN");
 		}
 	}
 
@@ -219,17 +224,9 @@ public class Interaction : MonoBehaviour
 			float A_error;
 			float B_error;
 
-			if (A.isHeld && B.isHeld)
+			if (B.isHeld && MainStateManager.instance.stateMachine.currentState == "[SETUP]")
 			{
-				joint.distance = Mathf.Clamp(AB_distance, B.GetRadius()/2f, 3f);
-				if (A.IsPlayerPad())
-				{
-					B.SetRadius(Mathf.Lerp(1f, 0.3f, joint.distance/3f));
-				} 
-				else if (B.IsPlayerPad())
-				{
-					A.SetRadius(Mathf.Lerp(1f, 0.3f, joint.distance/3f));
-				}
+				joint.SetDistance(Mathf.Clamp(AB_distance, B.GetRadius()/2f, 3f));
 			}
 			
 			if (A.isHeld || A.IsPlayerPad())
@@ -272,7 +269,7 @@ public class Interaction : MonoBehaviour
 		}
 	}
 
-	public void HandleJointRendering()
+	/*public void HandleJointRendering()
 	{
 		// Handle Joint Rendering
 		foreach (Joint joint in joints)
@@ -281,7 +278,7 @@ public class Interaction : MonoBehaviour
 
 			B.DrawJoint(A);
 		}
-	}
+	}*/
 
 	public void DestroyJoint(Pad child)
 	{

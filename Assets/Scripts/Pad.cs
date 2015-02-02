@@ -33,7 +33,8 @@ public class Pad : MonoBehaviour
 			if (finger.isValid && finger != null)
 			{
 				if ((this.isPlayerPad && MainStateManager.instance.stateMachine.currentState == "[GAME ON]")
-					|| (!this.isPlayerPad))
+					|| (!this.isPlayerPad && MainStateManager.instance.stateMachine.currentState == "[SETUP]" 
+						&& ((this.mother != null && this.mother.isHeld) || (this.mother == null))))
 				{
 					this.position = Vector2.Lerp(position, finger.position, Time.deltaTime * 2f);
 					this.velocity =  Vector2.Lerp(velocity, finger.velocity, Time.deltaTime * 2f);
@@ -56,9 +57,21 @@ public class Pad : MonoBehaviour
 		this.GetComponent<SpriteRenderer>().color = color;
 	}
 
+	void LateUpdate()
+	{
+		if (mother != null)
+		{
+			DrawJoint(mother);
+		}
+	}
+
 	void Move() 
 	{
-		this.position += this.velocity * Time.deltaTime;
+		if ((this.isPlayerPad && MainStateManager.instance.stateMachine.currentState != "[SETUP]")
+			|| (!this.isPlayerPad))
+		{
+			this.position += this.velocity * Time.deltaTime;
+		}
 	}
 
 	void Friction() 
@@ -186,6 +199,7 @@ public class Pad : MonoBehaviour
 	public void SetMother(Pad mother)
 	{
 		this.mother = mother;
+		Interaction.instance.CreateJoint(this, mother);
 	}
 
 	public Pad GetMother()

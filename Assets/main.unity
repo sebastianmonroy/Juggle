@@ -234,7 +234,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: .137254909}
+  m_Color: {r: 1, g: 1, b: 1, a: .384313732}
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 165
@@ -1174,7 +1174,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: .137254909}
+  m_Color: {r: 1, g: 1, b: 1, a: .384313732}
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 165
@@ -1736,11 +1736,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 22de644a7d2d1634c81b8a8719ca6edf, type: 2}
       propertyPath: m_Color.a
-      value: .137254909
+      value: .384313732
       objectReference: {fileID: 0}
     - target: {fileID: 11400002, guid: 22de644a7d2d1634c81b8a8719ca6edf, type: 2}
       propertyPath: m_Color.a
-      value: .137254909
+      value: .384313732
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 22de644a7d2d1634c81b8a8719ca6edf, type: 2}

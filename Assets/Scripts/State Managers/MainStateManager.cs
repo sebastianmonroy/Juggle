@@ -34,7 +34,10 @@ public class MainStateManager : MonoBehaviour
 	Timer setupTimer;
 	bool courtSetUp = false;
 	Vector3 originalLoadingBarScale;
-	
+
+	Pad p1Pad;
+	Pad p2Pad;
+
 	public void SetupEnter()
 	{
 		setupTimer = new Timer(10.0f);
@@ -46,19 +49,23 @@ public class MainStateManager : MonoBehaviour
 		if (!courtSetUp && Interaction.instance.initialized)
 		{
 			// Player Pads
-			Pad p1Pad = Interaction.instance.CreatePlayerPad(1, new Vector2(0f, -3.0f), playerPadRadius);
-			Pad p2Pad = Interaction.instance.CreatePlayerPad(2, new Vector2(0f, 3.0f), playerPadRadius);
+			p1Pad = Interaction.instance.CreatePlayerPad(1, new Vector2(0f, -3.0f), playerPadRadius);
+			p2Pad = Interaction.instance.CreatePlayerPad(2, new Vector2(0f, 3.0f), playerPadRadius);
 
 			// Child Pads
 			//Pad p1Child1 = Interaction.instance.CreateCourtPad(new Vector2(-2.5f, 0f), courtPadRadius);
 
 			// Court Pads
-			Interaction.instance.CreateCourtPad(new Vector2(-2.5f, 0f), courtPadRadius);
-			Interaction.instance.CreateCourtPad(new Vector2(-1.5f, 0f), courtPadRadius);
-			Interaction.instance.CreateCourtPad(new Vector2(-0.5f, 0f), courtPadRadius);
-			Interaction.instance.CreateCourtPad(new Vector2(0.5f, 0f), courtPadRadius);
-			Interaction.instance.CreateCourtPad(new Vector2(1.5f, 0f), courtPadRadius);
-			Interaction.instance.CreateCourtPad(new Vector2(2.5f, 0f), courtPadRadius);
+			Pad p1Child1 = Interaction.instance.CreateCourtPad(new Vector2(-1.5f, -3f), courtPadRadius);
+			Pad p1Child2 = Interaction.instance.CreateCourtPad(new Vector2(0f, -2f), courtPadRadius);
+			Pad p1Child3 = Interaction.instance.CreateCourtPad(new Vector2(1.5f, -3f), courtPadRadius);
+
+			Pad p2Child1 = Interaction.instance.CreateCourtPad(new Vector2(-1.5f, 3f), courtPadRadius);
+			Pad p2Child2 = Interaction.instance.CreateCourtPad(new Vector2(0f, 2f), courtPadRadius);
+			Pad p2Child3 = Interaction.instance.CreateCourtPad(new Vector2(1.5f, 3f), courtPadRadius);
+
+			p1Child1.SetMother(p1Pad); p1Child2.SetMother(p1Pad); p1Child3.SetMother(p1Pad);
+			p2Child1.SetMother(p2Pad); p2Child2.SetMother(p2Pad); p2Child3.SetMother(p2Pad);
 
 			courtSetUp = true;
 		}
@@ -70,12 +77,17 @@ public class MainStateManager : MonoBehaviour
 		LoadingBarTransform.localScale = new Vector3(originalLoadingBarScale.x, originalLoadingBarScale.y * (1f - setupTimer.Percent()), originalLoadingBarScale.z);
 
 		if (setupTimer.Percent() >= 1f)
-		{
+		{			
 			stateMachine.SwitchStates(onState);
 		}
 	}
 
-	public void OnEnter(){}
+	public void OnEnter()
+	{
+		p1Pad.SetVelocity(Vector2.zero);
+		p2Pad.SetVelocity(Vector2.zero);
+	}
+	
 	public void OnUpdate()
 	{
 		Interaction.instance.HandleFingerGrabs();
