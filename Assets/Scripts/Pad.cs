@@ -34,10 +34,10 @@ public class Pad : MonoBehaviour
 			{
 				if ((this.isPlayerPad && MainStateManager.instance.stateMachine.currentState == "[GAME ON]")
 					|| (!this.isPlayerPad && MainStateManager.instance.stateMachine.currentState == "[SETUP]" 
-						&& ((this.mother != null && this.mother.isHeld) || (this.mother == null))))
+						&& ((this.mother != null) || (this.mother == null))))
 				{
-					this.position = Vector2.Lerp(position, finger.position, Time.deltaTime * 2f);
-					this.velocity =  Vector2.Lerp(velocity, finger.velocity, Time.deltaTime * 2f);
+					this.position = Vector2.Lerp(position, finger.position, Time.deltaTime * 2.5f);
+					this.velocity = Vector2.Lerp(velocity, finger.velocity, Time.deltaTime * 2.5f);
 				}
 			}
 			else 
@@ -215,10 +215,12 @@ public class Pad : MonoBehaviour
 	IEnumerator Disable(float duration)
 	{
 		Color enabledColor = this.GetColor();
-		Color disabledColor = enabledColor;
-		disabledColor.a = 0.4f;
+		Color disabled1Color = enabledColor;
+		Color disabled2Color = enabledColor;
+		disabled1Color.a = 0.3f;
+		disabled2Color.a = 0.6f;
 		this.GetComponent<Collider2D>().enabled = false;
-		SetColor(disabledColor);
+		SetColor(disabled1Color);
 		//UndrawJoint();
 
 		Timer timer = new Timer(duration);
@@ -226,11 +228,11 @@ public class Pad : MonoBehaviour
 		{
 			if ((timer.Percent() % 0.2f) < 0.05f)
 			{
-				SetColor(enabledColor);
+				SetColor(disabled1Color);
 			}
 			else
 			{
-				SetColor(disabledColor);
+				SetColor(disabled2Color);
 			}
 			yield return 0;
 		}
@@ -293,6 +295,7 @@ public class Pad : MonoBehaviour
 				this.AddVelocity(-1.5f * this.GetVelocity());
 				AnimationHandler.instance.ChildOnMotherCollision(otherPad, this);
 				ScoreHandler.instance.PlayerScored(this.GetMother().player);
+				this.DisablePad();
 			}
 			// else if hit other player's child pad
 			else if (otherPad.GetMother() != null)
@@ -306,14 +309,14 @@ public class Pad : MonoBehaviour
 				otherPad.AddVelocity(myVelocity / 2f);
 				this.AddVelocity(otherVelocity / 2f);
 
-				if (myVelocity.magnitude > 3f && myVelocity.magnitude > otherVelocity.magnitude)
-				{
+				//if (myVelocity.magnitude > 3f && myVelocity.magnitude > otherVelocity.magnitude)
+				//{
 					this.DisablePad();
-				}
-				else if (otherVelocity.magnitude > 3f && myVelocity.magnitude <= otherVelocity.magnitude)
-				{
+				//}
+				//else if (otherVelocity.magnitude > 3f && myVelocity.magnitude <= otherVelocity.magnitude)
+				//{
 					otherPad.DisablePad();
-				}
+				//}
 
 				//Interaction.instance.DestroyJoint(this);
 				//Interaction.instance.DestroyJoint(otherPad);

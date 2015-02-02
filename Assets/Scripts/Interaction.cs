@@ -164,7 +164,7 @@ public class Interaction : MonoBehaviour
 			}
 			else if (A.isHeld || A.IsPlayerPad())
 			{
-				Vector3 newVel = Vector3.Dot(B.GetVelocity3(), B_tang_axis) * B_tang_axis * 1f;
+				Vector3 newVel = Vector3.Dot(B.GetVelocity3(), B_tang_axis) * B_tang_axis * 0.975f;
 				newVel += Vector3.Dot(A.GetVelocity3(), A_norm_axis) * A_norm_axis;
 
 				B.SetVelocity3(newVel);
@@ -173,7 +173,7 @@ public class Interaction : MonoBehaviour
 			}
 			else if (B.isHeld || B.IsPlayerPad())
 			{
-				Vector3 newVel = Vector3.Dot(A.GetVelocity3(), A_tang_axis) * A_tang_axis * 1f;
+				Vector3 newVel = Vector3.Dot(A.GetVelocity3(), A_tang_axis) * A_tang_axis * 0.975f;
 				newVel += Vector3.Dot(B.GetVelocity3(), B_norm_axis) * B_norm_axis;
 
 				A.SetVelocity3(newVel);
@@ -224,12 +224,12 @@ public class Interaction : MonoBehaviour
 			float A_error;
 			float B_error;
 
-			if (B.isHeld && MainStateManager.instance.stateMachine.currentState == "[SETUP]")
+			if ((A.isHeld || B.isHeld) && MainStateManager.instance.stateMachine.currentState == "[SETUP]")
 			{
-				joint.SetDistance(Mathf.Clamp(AB_distance, B.GetRadius()/2f, 3f));
+				joint.SetDistance(AB_distance);
 			}
 			
-			if (A.isHeld || A.IsPlayerPad())
+			if (A.IsPlayerPad())
 			{
 				A_desiredPosition = A.GetPosition();
 
@@ -240,7 +240,7 @@ public class Interaction : MonoBehaviour
 				B_newVelocity = B_tangVelocity * B_tang_axis + B_normVelocity * B_norm_axis;
 				//Debug.Log(B_addedVelocity);
 			}
-			else if (B.isHeld || B.IsPlayerPad())
+			else if (B.IsPlayerPad())
 			{
 				B_desiredPosition = B.GetPosition();
 
@@ -251,7 +251,7 @@ public class Interaction : MonoBehaviour
 				A_newVelocity = A_tangVelocity * A_tang_axis + A_normVelocity * A_norm_axis;
 				//Debug.Log(A_addedVelocity);
 			}
-			else 
+			/*else 
 			{
 				float AB_error = AB_distance - joint.distance;
 				A_error = AB_error / 2f;
@@ -262,7 +262,7 @@ public class Interaction : MonoBehaviour
 				
 				A_newVelocity = A_tangVelocity * A_tang_axis + A_normVelocity * A_norm_axis;
 				B_newVelocity = B_tangVelocity * B_tang_axis + B_normVelocity * B_norm_axis;
-			}
+			}*/
 
 			A.SetVelocity(A_newVelocity);
 			B.SetVelocity(B_newVelocity);
