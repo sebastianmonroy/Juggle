@@ -16,6 +16,7 @@ public class Pad : MonoBehaviour
 
 	public Pad mother;
 	public bool isPlayerPad = false;
+	public int player = -1;
 	public bool debug; 
 
 	private LineRenderer lineRenderer;
@@ -31,8 +32,12 @@ public class Pad : MonoBehaviour
 		{
 			if (finger.isValid && finger != null)
 			{
-				this.position = Vector2.Lerp(position, finger.position, Time.deltaTime * 5f);
-				this.velocity =  Vector2.Lerp(velocity, finger.velocity, Time.deltaTime * 5f);
+				if ((this.isPlayerPad && MainStateManager.instance.stateMachine.currentState == "[GAME ON]")
+					|| (!this.isPlayerPad))
+				{
+					this.position = Vector2.Lerp(position, finger.position, Time.deltaTime * 2f);
+					this.velocity =  Vector2.Lerp(velocity, finger.velocity, Time.deltaTime * 2f);
+				}
 			}
 			else 
 			{
@@ -58,12 +63,21 @@ public class Pad : MonoBehaviour
 
 	void Friction() 
 	{
-		this.velocity *= 0.95f;
+		this.velocity *= 0.975f;
 	}
 
-	public void SetPlayerPad(bool isPlayerPad)
+	public void SetPlayerPad(int player)
 	{
-		this.isPlayerPad = isPlayerPad;
+		this.player = player;
+		
+		if (player > 0 && player < 3)
+		{
+			this.isPlayerPad = true;
+		}
+		else
+		{
+			this.isPlayerPad = false;
+		}
 	}
 
 	public bool IsPlayerPad()
@@ -143,14 +157,21 @@ public class Pad : MonoBehaviour
 
 	public void DrawJoint(Pad other)
 	{
+		lineRenderer.enabled = true;
 		lineRenderer.SetVertexCount(2);
 		lineRenderer.SetPosition(0, this.transform.position);
 		lineRenderer.SetPosition(1, other.transform.position);
 	}
 
+	public void RedrawJoint()
+	{
+		DrawJoint(mother);
+	}
+
 	public void UndrawJoint()
 	{
 		lineRenderer.SetVertexCount(0);
+		lineRenderer.enabled = false;
 	}
 
 	public void Hold(Finger finger) 
@@ -170,6 +191,39 @@ public class Pad : MonoBehaviour
 	public Pad GetMother()
 	{
 		return this.mother;
+	}
+
+	public void DisablePad()
+	{
+		StartCoroutine(Disable(3.0f));
+	}
+
+	IEnumerator Disable(float duration)
+	{
+		Color enabledColor = this.GetColor();
+		Color disabledColor = enabledColor;
+		disabledColor.a = 0.4f;
+		this.GetComponent<Collider2D>().enabled = false;
+		SetColor(disabledColor);
+		//UndrawJoint();
+
+		Timer timer = new Timer(duration);
+		while (timer.Percent() < 1f)
+		{
+			if ((timer.Percent() % 0.2f) < 0.05f)
+			{
+				SetColor(enabledColor);
+			}
+			else
+			{
+				SetColor(disabledColor);
+			}
+			yield return 0;
+		}
+
+		this.GetComponent<Collider2D>().enabled = true;
+		SetColor(enabledColor);
+		//RedrawJoint();
 	}
 
 	void Print(string output)
@@ -218,12 +272,13 @@ public class Pad : MonoBehaviour
 			Vector2 collisionTo = otherPad.GetPosition() - this.GetPosition();
 
 			// if hit the other player's mother pad
-			if (otherPad.IsPlayerPad() && this.GetMother() != otherPad)
+			if (otherPad.IsPlayerPad() && this.GetMother() != otherPad && !this.isHeld)
 			{
 				Print("hit mother pad");
 				//otherPad.SetRadius(0.9f * otherPad.GetRadius());
 				this.AddVelocity(-1.5f * this.GetVelocity());
 				AnimationHandler.instance.ChildOnMotherCollision(otherPad, this);
+				ScoreHandler.instance.PlayerScored(this.GetMother().player);
 			}
 			// else if hit other player's child pad
 			else if (otherPad.GetMother() != null)
@@ -237,8 +292,17 @@ public class Pad : MonoBehaviour
 				otherPad.AddVelocity(myVelocity / 2f);
 				this.AddVelocity(otherVelocity / 2f);
 
-				Interaction.instance.DestroyJoint(this);
-				Interaction.instance.DestroyJoint(otherPad);
+				if (myVelocity.magnitude > 3f && myVelocity.magnitude > otherVelocity.magnitude)
+				{
+					this.DisablePad();
+				}
+				else if (otherVelocity.magnitude > 3f && myVelocity.magnitude <= otherVelocity.magnitude)
+				{
+					otherPad.DisablePad();
+				}
+
+				//Interaction.instance.DestroyJoint(this);
+				//Interaction.instance.DestroyJoint(otherPad);
 				
 				/*if (myVelocity.magnitude > 25f && myVelocity.magnitude >= 2f * otherVelocity.magnitude)
 				{

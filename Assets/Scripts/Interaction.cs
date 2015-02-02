@@ -41,19 +41,20 @@ public class Interaction : MonoBehaviour
 		}
 	}
 
-	public void CreatePlayerPad(Vector2 position, float radius = 1f)
+	public Pad CreatePlayerPad(int player, Vector2 position, float radius = 1f)
 	{
 		GameObject newPadObject = Instantiate(padPrefab, new Vector3(position.x, position.y, 0f), Quaternion.identity) as GameObject;
 		Pad newPad = newPadObject.GetComponent<Pad>();
 		newPad.SetPosition(position);
 		newPad.SetRadius(radius);
 		newPad.SetColor(RandomColor());
-		newPad.SetPlayerPad(true);
+		newPad.SetPlayerPad(player);
 		
 		pads.Add(newPad);
+		return newPad;
 	}
 
-	public void CreateCourtPad(Vector2 position, float radius = 0.5f)
+	public Pad CreateCourtPad(Vector2 position, float radius = 0.5f)
 	{
 		GameObject newPadObject = Instantiate(padPrefab, new Vector3(position.x, position.y, 0f), Quaternion.identity) as GameObject;
 		Pad newPad = newPadObject.GetComponent<Pad>();
@@ -62,6 +63,7 @@ public class Interaction : MonoBehaviour
 		newPad.SetColor(RandomColor());
 		
 		pads.Add(newPad);
+		return newPad;
 	}
 
 	public void CreateFingerPad(Finger finger)
@@ -157,7 +159,7 @@ public class Interaction : MonoBehaviour
 			}
 			else if (A.isHeld || A.IsPlayerPad())
 			{
-				Vector3 newVel = Vector3.Dot(B.GetVelocity3(), B_tang_axis) * B_tang_axis * 0.975f;
+				Vector3 newVel = Vector3.Dot(B.GetVelocity3(), B_tang_axis) * B_tang_axis * 1f;
 				newVel += Vector3.Dot(A.GetVelocity3(), A_norm_axis) * A_norm_axis;
 
 				B.SetVelocity3(newVel);
@@ -166,7 +168,7 @@ public class Interaction : MonoBehaviour
 			}
 			else if (B.isHeld || B.IsPlayerPad())
 			{
-				Vector3 newVel = Vector3.Dot(A.GetVelocity3(), A_tang_axis) * A_tang_axis * 0.975f;
+				Vector3 newVel = Vector3.Dot(A.GetVelocity3(), A_tang_axis) * A_tang_axis * 1f;
 				newVel += Vector3.Dot(B.GetVelocity3(), B_norm_axis) * B_norm_axis;
 
 				A.SetVelocity3(newVel);
@@ -219,9 +221,18 @@ public class Interaction : MonoBehaviour
 
 			if (A.isHeld && B.isHeld)
 			{
-				joint.distance = AB_distance;
+				joint.distance = Mathf.Clamp(AB_distance, B.GetRadius()/2f, 3f);
+				if (A.IsPlayerPad())
+				{
+					B.SetRadius(Mathf.Lerp(1f, 0.3f, joint.distance/3f));
+				} 
+				else if (B.IsPlayerPad())
+				{
+					A.SetRadius(Mathf.Lerp(1f, 0.3f, joint.distance/3f));
+				}
 			}
-			else if (A.isHeld || A.IsPlayerPad())
+			
+			if (A.isHeld || A.IsPlayerPad())
 			{
 				A_desiredPosition = A.GetPosition();
 
